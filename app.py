@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, request, session, abort
 import os
 import cohere
+from cohere.classify import Example
 
 app = Flask(__name__)
 apiKey = os.environ.get('COHERE_API_KEY')
@@ -28,11 +29,88 @@ def build_prompt(list1):
         presence_penalty=0,
         stop_sequences=["--"],
         return_likelihoods='NONE')
-    finalResult = ('{}'.format(response.generations[0].text))
+    finalResult = (stringPrompt + (response.generations[0].text)).split('\n')
     print(finalResult)
 
     return finalResult
 
+
+def classify_lessons():
+    response = apiKey.classify(
+        model='large',
+        inputs=["Students will understand how systems work."],
+        examples=[Example(
+            "In this lesson, students will practice representing numbers in binary (base 2). They will practice converting numbers and explore the concept of place value in the context of binary numbers.",
+            "Computer Science"), Example(
+            "In this lesson, students will explore the unique properties of water that are necessary to support life.",
+            "Biology"), Example(
+            "In this lesson, students will describe the movement of substances across the selective permeable membrane into or out of the cell to protect its internal environment.",
+            "Biology"), Example(
+            "In this lesson, students will be introduced to programming concepts using music. Students will create artifacts with a practical, personal, or societal intent.",
+            "Computer Science"), Example(
+            "In this lesson, students will correlate internal hearing with singing and pitch identification.", "Music"),
+                  Example(
+                      "In this lesson, students will sing a piece of music at sight based on the tonal, modal, chromatic, and atonal systems.",
+                      "Music"), Example(
+                "In this lesson, students will understand musical styles and genres in relation to the key social, political, economic, philosophical, and aesthetic forces that helped shape them.",
+                "Music"), Example(
+                "In this lesson, students make connections between the first inventions of the 19th century and the great social changes that affected slavery and imperialism.",
+                "History"), Example(
+                "In this lesson, students will students will analyze and demonstrate knowledge of the history, or change over time, of different regions of the world.",
+                "History"), Example(
+                "In this lesson, students will apply Gregor Mendel’s principles and concept of probability to predict traits by using a Punnett Square.",
+                "Biology"), Example(
+                "In this lesson, students will compare simple and compound machines in the real world. Students will develop a manipulator to accomplish a class task.",
+                "Robotics"), Example(
+                "In this lesson, students learn how the robot responds to command icons in sequence and bring together the concepts of time, speed, and distance.",
+                "Robotics"), Example(
+                "In this lesson, students learn about basic robot sensing and control similar to that used in advanced automated factories and warehouses.",
+                "Robotics"), Example(
+                "In this lesson, students will compare the different forms of energy and research various sustainable energy solutions.",
+                "Environmental Science"), Example(
+                "In this lesson the student will demonstrate the ability to use scientific skills necessary to identify and analyze environmental issues.",
+                "Environmental Science"), Example(
+                "In this lesson students will analyze and recognize the interrelationships in a good chain and a food web.",
+                "Environmental Science"), Example(
+                "In this lesson, students will describe the structure of an atom and distinguish between the two main types of chemical bonds.",
+                "Chemistry"), Example(
+                "In this lesson, students will explain the growth and populations and factors that influence them.",
+                "Environmental Science"), Example(
+                "In this lesson, students will analyze population changes in specific countries and learn about China\'s one child policy",
+                "History"), Example(
+                "In this lesson, students will use the art of communication to quickly persuade or convince their peers to change their minds on a variety of popular or unpopular opinions.",
+                "Language Arts"), Example(
+                "In this lesson, students will be using Internet resources the students find definitions and examples of hyperboles and paradox, and then create their own to share with peers, and identify their use in a current reading selection.",
+                "Language Arts"), Example(
+                "In this lesson, students will be able to explain clearly the rules on the present perfect tense of verbs as differentiated from the simple present and past tenses.",
+                "Language Arts"),
+                  Example("The student will be able to calculate the square footage of a given area.", "Math"), Example(
+                "In this lesson, students will be able to use computation skills to add decimals for the correct sum.",
+                "Math"), Example(
+                "In this lesson, students will learn the proper way to calculate hourly wages including taxes, and tips, etc.",
+                "Math"), Example(
+                "In this lesson, students will describe heterogeneous mixtures, including suspensions and colloids.",
+                "Chemistry"),
+                  Example("Use the periodic table to identify trends in electronegativity and electron affinity.",
+                          "Chemistry"), Example(
+                "In this lesson, students will design and conduct an experiment to test the properties of substances.",
+                "Chemistry"), Example(
+                "Students program the robot to make decisions (artificial intelligence) in response to obstacles in the robot’s environment.",
+                "Computer Science"), Example(
+                "In this lesson, students will demonstrate the ability to analyze the movement of matter and energy through the biosphere.",
+                "Biology"),
+                  Example("In this lesson, students will differentiate between servo and non-servo control systems",
+                          "Robotics"), Example(
+                "In this lesson, students will differentiate the structure and function of each organ in the body systems.",
+                "Biology"), Example(
+                "In this lesson, students will indicate the names and functions of hardware ports and the parts of the motherboard and describe how the CPU processes data and instructions and controls the operation of all other devices.",
+                "Computer Science"), Example(
+                "In this lesson, students will discuss earth\'s systems and the biogeochemical cycles of water, carbon, nitrogen, and phosphorus.",
+                "Biology"), Example(
+                "In this lesson, students will discuss earth\'s systems and the biogeochemical cycles of water, carbon, nitrogen, and phosphorus.",
+                "Environmental Science")])
+    final = ('The confidence levels of the labels are: {}'.format(response.classifications))
+    return final
 
 promptMaterials = []
 
@@ -45,7 +123,6 @@ def index():  # put application's code here
 @app.route('/generate', methods=["GET", "POST"])
 def generate():
     if request.method == "POST":
-        # getting input with name = fname in HTML form
         lessonTitle_in = request.form.get("lTitle")
         if lessonTitle_in != "":
             promptMaterials.append("Lesson Title: " + lessonTitle_in)
@@ -65,6 +142,14 @@ def generate():
         if relatedSubjects_in != "":
             promptMaterials.append("Related Subjects: " + relatedSubjects_in)
         finalResult = build_prompt(promptMaterials)
+        '''
+        label1 = finalResult[0]
+        label2 = finalResult[1]
+        label3 = finalResult[2]
+        label4 = finalResult[3]
+        label5 = finalResult[4]
+        label6 = finalResult[5]
+        '''
         return render_template("results.html", label1=finalResult)
     return render_template("AIToolTemp.html")
 
