@@ -17,9 +17,10 @@ Technologies Used:
 
 
 ### Links:
-[Presentation](https://docs.google.com/presentation/d/1N63s9mvfw-H39uqWwcT9ESD0eoxzY8EilBl5cvTQpxo/edit?usp=sharing)
-[Submission Page](https://lablab.ai/event/generative-ai-hackathon/la-hackers/GenerativEDU)
+* [Presentation](https://docs.google.com/presentation/d/1N63s9mvfw-H39uqWwcT9ESD0eoxzY8EilBl5cvTQpxo/edit?usp=sharing)
+* [Submission Page](https://lablab.ai/event/generative-ai-hackathon/la-hackers/GenerativEDU)
 
+#### Form View
 ![Form View ScreenShot](FormView.png)
 
 ### Next Steps:
